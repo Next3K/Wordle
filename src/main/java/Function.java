@@ -105,7 +105,8 @@ public class Function {
     public static int calculateScore(String str, Map<Character, Integer> letterFrequencies) {
         int score = 0;
         for (int i = 0; i < str.length(); i++) {
-            score |= (1 << letterFrequencies.get(str.charAt(i)));
+            Integer letterScore = letterFrequencies.get(str.charAt(i));
+            score += (letterScore * letterScore);
         }
         return score;
     }

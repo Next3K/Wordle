@@ -11,7 +11,9 @@ public class Solver {
         HashSet<Integer> memo = new HashSet<>(50_000);
 
         long startTime = System.currentTimeMillis();
-
+        Map<Character, Integer> frequencyMap = Function.getFrequencyMap(allWords);
+        Comparator<Wrapper> cmp = Comparator.comparingInt(a -> Function.calculateScore(a.getWord(), frequencyMap));
+        allWords.sort(cmp);
         boolean foundSolution = solveRecursive(allWords, memo,
                 solution, 0, new HashSet<>(26), 0);
 
@@ -41,9 +43,12 @@ public class Solver {
         if (solutionSize == 4) {
             for (int i = startIndex; i < words.size(); i++) {
                 Wrapper wrapper = words.get(i);
-                if ((wrapper.getSignature() ^ stopSignature) == 0) {
+                int checkSignature = currentSignature | wrapper.getSignature();
+                if ((checkSignature ^ stopSignature) == 0) {
                     currentSolution.add(wrapper);
                     return true;
+                } else {
+                    memo.add(checkSignature);
                 }
             }
             return false;
