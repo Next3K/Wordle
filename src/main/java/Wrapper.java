@@ -11,7 +11,6 @@ public class Wrapper {
     @Getter
     private final int signature;
 
-
     public Wrapper(String word) {
         this.word = word;
         this.signature = Function.calculateSignature(this.word);
