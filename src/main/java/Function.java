@@ -18,7 +18,7 @@ public class Function {
     }
 
     /**
-     * Read all words from the file
+     * Read all words from the txt file
      * @return list of 5-letter words with unique characters
      */
     public static List<Wrapper> getAllWords() {
@@ -48,10 +48,10 @@ public class Function {
     }
 
     /**
-     * Check if text contains letter that is in the set
-     * @param str - text
-     * @param usedCharacters set of characters
-     * @return true if text contains character that is in the set
+     * Check if text contains any letter that is in the set
+     * @param str - source text
+     * @param usedCharacters - set of characters
+     * @return true if text contains at least one character that is in the set
      */
     public static boolean containsForbiddenCharacter(String str, Set<Character> usedCharacters) {
         for (int i = 0; i < str.length(); i++) {
@@ -61,14 +61,14 @@ public class Function {
     }
 
     /**
-     * Calculate how common alphabet letters are in a list of words
-     * @param tokens - list of words to analyze
-     * @return map with info of how common every letter is
+     * Traverse the list of wrappers that contain words and count occurrences of each character
+     * @param tokens - list of wrappers with words to traverse
+     * @return map containing info about the number of occurrences of each letter
      */
     public static Map<Character, Integer> getFrequencyMap(List<Wrapper> tokens) {
         Map<Character, Integer> letterFreq = new HashMap<>(26);
         char c = 'a';
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 26; i++) { // fill the map with alphabet
             letterFreq.put((char) (c + i), 0);
         }
         for (var word : tokens) {
@@ -84,23 +84,27 @@ public class Function {
     }
 
     /**
-     * Calculates bitwise signature of word
+     * Calculates bitwise signature of 5-letter word
+     * Example some word:
+     *  - - - b - j - o - r - - - k
+     *  Will be mapped to:
+     *  0 0 0 1 0 1 0 1 0 1 0 0 0 1
      * @param str - word to calculate bitwise signature of
      * @return integer representing bitwise signature
      */
     public static int calculateSignature(String str) {
         int tmp = 0;
         for (int i = 0; i < str.length(); i++) {
-            tmp |= (1 << Function.lettersPositions.get(str.charAt(i)));
+            tmp |= (1 << Function.lettersPositions.get(str.charAt(i))); // bit flip
         }
         return tmp;
     }
 
     /**
-     * Calculate how common letters that make a word are
+     * Calculates the score for each word based on the frequency of its letters
      * @param str - the word
-     * @param letterFrequencies - how common all letters are
-     * @return score
+     * @param letterFrequencies - how common all letters are in general
+     * @return total score as the sum of squared occurrences of all letters
      */
     public static int calculateScore(String str, Map<Character, Integer> letterFrequencies) {
         int score = 0;

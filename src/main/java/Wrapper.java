@@ -1,11 +1,14 @@
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Immutable class wrapping 5-letter word
  */
+@ToString(onlyExplicitlyIncluded = true)
 public class Wrapper {
 
     @Getter
+    @ToString.Include
     private final String word;
 
     @Getter
@@ -14,12 +17,5 @@ public class Wrapper {
     public Wrapper(String word) {
         this.word = word;
         this.signature = Function.calculateSignature(this.word);
-    }
-
-    @Override
-    public String toString() {
-        return "Wrapper{" +
-                "str='" + word + '\'' +
-                '}';
     }
 }
