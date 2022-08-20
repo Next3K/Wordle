@@ -13,7 +13,7 @@ public class Solver {
         long startTime = System.currentTimeMillis();
 
         boolean foundSolution = solveRecursive(allWords, memo,
-                solution, 0, new HashSet<>(26));
+                solution, 0, new HashSet<>(26), 0);
 
         long endTime = System.currentTimeMillis();
 
@@ -25,7 +25,8 @@ public class Solver {
                                           Set<Integer> memo,
                                           List<Wrapper> currentSolution,
                                           int currentSignature,
-                                          Set<Character> usedCharacters) {
+                                          Set<Character> usedCharacters,
+                                          int startIndex) {
 
         // memoization check
         if (memo.contains(currentSignature)) {
@@ -34,47 +35,45 @@ public class Solver {
             memo.add(currentSignature);
         }
 
+        int solutionSize = currentSolution.size();
+
         // Check if we are done
-        int originalSize = currentSolution.size();
-        if (originalSize == 5) {
-            return (currentSignature ^ stopSignature) == 0;
+        if (solutionSize == 4) {
+            for (int i = startIndex; i < words.size(); i++) {
+                Wrapper wrapper = words.get(i);
+                if ((wrapper.getSignature() ^ stopSignature) == 0) {
+                    currentSolution.add(wrapper);
+                    return true;
+                }
+            }
+            return false;
         }
 
-        // remove illegal words containing used letters
-        words.removeIf(e -> Function.containsForbiddenCharacter(e.getWord(), usedCharacters));
-        if (words.size() < (5 - originalSize)) return false;
+        // we need (5 - solutionSize) words but there is only n words left in the list
+        if ((words.size() - startIndex) < (5 - solutionSize)) return false;
 
-        // update letter frequency
-        Map<Character, Integer> letterFreq = Function.getFrequencyMap(words);
-
-        // sort all current words with score ascending
-        Comparator<Wrapper> cmp = Comparator.comparingInt(a -> Function.calculateScore(a.getWord(), letterFreq));
-        words.sort(cmp.reversed());
-
-        for (int i = 0; i < words.size(); i++) {
+        for (int i = startIndex; i < words.size(); i++) {
             Wrapper word = words.get(i);
             String wordStr = word.getWord();
-            Set<Character> newUsedCharacters = new HashSet<>(usedCharacters);
+
+            if (Function.containsForbiddenCharacter(wordStr, usedCharacters)) continue;
 
             // add this word to list of words that may be a solution
             currentSolution.add(word);
-            // add 5 used characters to the set
+
+            // create new set of used letters and add 5 new letters
+            Set<Character> newUsedCharacters = new HashSet<>(usedCharacters);
             for (int j = 0; j < wordStr.length(); j++) {
                 newUsedCharacters.add(wordStr.charAt(j));
             }
-            // create a new list of words without unnecessary words
-            int capacity = words.size() - i;
-            List<Wrapper> newWords = new ArrayList<>(capacity);
-            for (int k = 0; k < capacity; k++) {
-                newWords.add(words.get(k));
-            }
-            if (solveRecursive(newWords, memo, currentSolution,
-                    currentSignature | word.getSignature(), newUsedCharacters)) {
+
+            if (solveRecursive(words, memo, currentSolution,
+                    currentSignature | word.getSignature(), newUsedCharacters,i + 1)) {
                 return true;
             }
+
             // did not find solution, revert list to the original state (cut of the tail of the list)
-            int currentSize = currentSolution.size();
-            currentSolution.subList(originalSize, currentSize).clear();
+            currentSolution.subList(solutionSize, currentSolution.size()).clear();
         }
         return false;
     }
