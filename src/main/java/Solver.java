@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Solver {
 
@@ -30,6 +31,15 @@ public class Solver {
                                           Set<Character> usedCharacters,
                                           int startIndex) {
 
+        List<Wrapper> currentList = words;
+
+        if (usedCharacters.size() != 0) {
+            currentList =
+                    words.stream().filter(e -> !Function.containsForbiddenCharacter(e.getWord(), usedCharacters)).toList();
+            startIndex = 0;
+        }
+
+        
         // memoization check
         if (memo.contains(currentSignature)) {
             return false;
@@ -41,8 +51,8 @@ public class Solver {
 
         // Check if we are done
         if (solutionSize == 4) {
-            for (int i = startIndex; i < words.size(); i++) {
-                Wrapper wrapper = words.get(i);
+            for (int i = startIndex; i < currentList.size(); i++) {
+                Wrapper wrapper = currentList.get(i);
                 int checkSignature = currentSignature | wrapper.getSignature();
                 if ((checkSignature ^ stopSignature) == 0) {
                     currentSolution.add(wrapper);
@@ -54,25 +64,25 @@ public class Solver {
             return false;
         }
 
-        // we need (5 - solutionSize) words but there is only n words left in the list
-        if ((words.size() - startIndex) < (5 - solutionSize)) return false;
+        // we need (5 - solutionSize) currentList but there is only n currentList left in the list
+        if ((currentList.size() - startIndex) < (5 - solutionSize)) return false;
 
-        for (int i = startIndex; i < words.size(); i++) {
-            Wrapper word = words.get(i);
-            String wordStr = word.getWord();
+        for (int i = startIndex; i < currentList.size(); i++) {
+            Wrapper word = currentList.get(i);
+            String currentWordStr = word.getWord();
 
-            if (Function.containsForbiddenCharacter(wordStr, usedCharacters)) continue;
+            if (Function.containsForbiddenCharacter(currentWordStr, usedCharacters)) continue;
 
-            // add this word to list of words that may be a solution
+            // add this word to list of currentList that may be a solution
             currentSolution.add(word);
 
             // create new set of used letters and add 5 new letters
             Set<Character> newUsedCharacters = new HashSet<>(usedCharacters);
-            for (int j = 0; j < wordStr.length(); j++) {
-                newUsedCharacters.add(wordStr.charAt(j));
+            for (int j = 0; j < currentWordStr.length(); j++) {
+                newUsedCharacters.add(currentWordStr.charAt(j));
             }
 
-            if (solveRecursive(words, memo, currentSolution,
+            if (solveRecursive(currentList, memo, currentSolution,
                     currentSignature | word.getSignature(), newUsedCharacters,i + 1)) {
                 return true;
             }
