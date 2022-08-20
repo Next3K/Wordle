@@ -17,7 +17,6 @@ public class Wrapper {
         this.signature = Function.calculateSignature(this.word);
     }
 
-
     @Override
     public String toString() {
         return "Wrapper{" +
