@@ -71,8 +71,6 @@ public class Solver {
             Wrapper word = currentList.get(i);
             String currentWordStr = word.getWord();
 
-            if (Function.containsForbiddenCharacter(currentWordStr, usedCharacters)) continue;
-
             // add this word to list of currentList that may be a solution
             currentSolution.add(word);
 
